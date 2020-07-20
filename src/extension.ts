@@ -325,7 +325,7 @@ export function activate(context: vscode.ExtensionContext) {
     };
 
     const componentName = await vscode.window.showInputBox({
-      prompt: 'Enter method name',
+      prompt: 'Enter component name',
       placeHolder: 'MyComponent'
     });
 
