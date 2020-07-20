@@ -1,0 +1,113 @@
+{
+	"name": "vscode-vuejs-helper",
+	"displayName": "VSCode VueJS helper",
+	"description": "VueJS Helper for VS Code",
+	"version": "1.0.0",
+	"publisher": "AttilioCapocchiani",
+	"repository": "https://github.com/Microsoft/vscode-extension-samples/helloworld-sample",
+	"engines": {
+		"vscode": "^1.34.0"
+	},
+	"categories": [
+		"Other"
+	],
+	"activationEvents": [
+		"onLanguage:vue"
+	],
+	"main": "./out/extension.js",
+	"contributes": {
+		"commands": [
+			{
+				"command": "vueSfcEditor.addCreatedSection",
+				"title": "Vue SFC Editor: Add created function"
+			},
+			{
+				"command": "vueSfcEditor.addDataSection",
+				"title": "Vue SFC Editor: Add data function"
+			},
+			{
+				"command": "vueSfcEditor.addMethodsSection",
+				"title": "Vue SFC Editor: Add methods Section"
+			},
+			{
+				"command": "vueSfcEditor.addWatchSection",
+				"title": "Vue SFC Editor: Add watch Section"
+			},
+			{
+				"command": "vueSfcEditor.addData",
+				"title": "Vue SFC Editor: Add reactive variable"
+			},
+			{
+				"command": "vueSfcEditor.addMethod",
+				"title": "Vue SFC Editor: Add Method"
+			},
+			{
+				"command": "vueSfcEditor.addWatch",
+				"title": "Vue SFC Editor: Add Watch"
+			},
+			{
+				"command": "vueSfcEditor.createComponent",
+				"title": "Vue SFC Editor: Create SFC"
+			},
+			{
+				"command": "vueSfcEditor.sortData",
+				"title": "Vue SFC Editor: Sort Data"
+			}
+		],
+		"menus": {
+			"commandPalette": [
+				{
+					"command": "vueSfcEditor.addData",
+					"when": "editorLangId == vue"
+				},
+				{
+					"command": "vueSfcEditor.addMethod",
+					"when": "editorLangId == vue"
+				},
+				{
+					"command": "vueSfcEditor.addWatch",
+					"when": "editorLangId == vue"
+				},
+				{
+					"command": "vueSfcEditor.addCreatedSection",
+					"when": "false"
+				},
+				{
+					"command": "vueSfcEditor.addDataSection",
+					"when": "false"
+				},
+				{
+					"command": "vueSfcEditor.addMethodsSection",
+					"when": "false"
+				},
+				{
+					"command": "vueSfcEditor.addWatchSection",
+					"when": "false"
+				},
+				{
+					"command": "vueSfcEditor.createComponent",
+					"when": "editorLangId == vue"
+				},
+				{
+					"command": "vueSfcEditor.sortData",
+					"when": "false"
+				}
+			]
+		}
+	},
+	"scripts": {
+		"vscode:prepublish": "npm run compile",
+		"compile": "tsc -p ./",
+		"lint": "eslint . --ext .ts,.tsx",
+		"watch": "tsc -watch -p ./"
+	},
+	"devDependencies": {
+		"@types/node": "^12.12.0",
+		"@types/vscode": "^1.34.0",
+		"@typescript-eslint/eslint-plugin": "^3.0.2",
+		"@typescript-eslint/parser": "^3.0.2",
+		"eslint": "^7.1.0",
+		"typescript": "^3.9.4"
+	},
+	"dependencies": {}
+}
