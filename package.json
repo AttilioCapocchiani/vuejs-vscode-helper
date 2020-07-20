@@ -1,15 +1,15 @@
 {
-	"name": "vscode-vuejs-helper",
-	"displayName": "VSCode VueJS helper",
+	"name": "vuejs-helper",
+	"displayName": "VueJS helper",
 	"description": "VueJS Helper for VS Code",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"publisher": "AttilioCapocchiani",
-	"repository": "https://github.com/Microsoft/vscode-extension-samples/helloworld-sample",
+	"repository": "https://github.com/AttilioCapocchiani/vuejs-vscode-helper",
 	"engines": {
 		"vscode": "^1.34.0"
 	},
 	"categories": [
-		"Other"
+		"Programming Languages"
 	],
 	"activationEvents": [
 		"onLanguage:vue"
