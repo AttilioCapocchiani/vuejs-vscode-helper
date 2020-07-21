@@ -30,6 +30,10 @@
 				"title": "Vue SFC Editor: Add methods Section"
 			},
 			{
+				"command": "vueSfcEditor.addPropsSection",
+				"title": "Vue SFC Editor: Add props Section"
+			},
+			{
 				"command": "vueSfcEditor.addWatchSection",
 				"title": "Vue SFC Editor: Add watch Section"
 			},
@@ -40,6 +44,10 @@
 			{
 				"command": "vueSfcEditor.addMethod",
 				"title": "Vue SFC Editor: Add Method"
+			},
+			{
+				"command": "vueSfcEditor.addProp",
+				"title": "Vue SFC Editor: Add Prop"
 			},
 			{
 				"command": "vueSfcEditor.addWatch",
@@ -65,6 +73,10 @@
 					"when": "editorLangId == vue"
 				},
 				{
+					"command": "vueSfcEditor.addProp",
+					"when": "editorLangId == vue"
+				},
+				{
 					"command": "vueSfcEditor.addWatch",
 					"when": "editorLangId == vue"
 				},
@@ -74,6 +86,10 @@
 				},
 				{
 					"command": "vueSfcEditor.addDataSection",
+					"when": "false"
+				},
+				{
+					"command": "vueSfcEditor.addPropsSection",
 					"when": "false"
 				},
 				{

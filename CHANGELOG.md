@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.1
+- Added support for props creation
+
 ## 1.0.5
 - Fixed png in documentation
 - Disabled data sort functionality
