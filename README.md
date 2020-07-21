@@ -1,5 +1,7 @@
 # VueJS Helper
 
+![demo](asset/demo.gif)
+
 This extension allows a quick development when using VueJS.
 
 Included commands are the following ![Commands](asset/commands.png)
@@ -10,7 +12,7 @@ Included commands are the following ![Commands](asset/commands.png)
 - Create SFC: starts a wizard to create a Single File Component, asking for:
     - Component name
     - Whether to add `template` tag, `style` tag and if it should be included in a separate folder. If `style` tag is selected, the user will be prompted to choose a pre-processor too
-    ![Wizard](asset/tags.png)
+    ![Wizard](asset/tags.PNG)
     ![Pre-processors](asset/pre-processors.png)
 
 
