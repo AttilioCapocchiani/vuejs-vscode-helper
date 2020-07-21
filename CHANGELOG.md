@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.0.2
+## 1.0.5
 - Fixed png in documentation
 - Disabled data sort functionality
 
