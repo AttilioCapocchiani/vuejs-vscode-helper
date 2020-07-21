@@ -1,10 +1,11 @@
 import * as vscode from 'vscode';
-import { buildMethodCode, buildWatchCode, createSFC, extractObject, regexIndexOf } from './utils/utils';
-import { AddDataState, AddWatchState, CreateSFCState } from './utils/interfaces';
+import { buildMethodCode, buildWatchCode, buildPropCode, createSFC, extractObject, regexIndexOf } from './utils/utils';
+import { AddDataState, AddWatchState, CreatePropState, CreateSFCState } from './utils/interfaces';
 
 import { DataCodeLensProvider } from './codelens/DataCodeLensProvider';
 import { ExportDefaultCodeLensProvider } from './codelens/ExportDefaultCodeLensProvider';
 import { MethodCodeLensProvider } from './codelens/MethodCodeLensProvider';
+import { PropCodeLensProvider } from './codelens/PropCodeLensProvider';
 import { WatchCodeLensProvider } from './codelens/WatchCodeLensProvider';
 
 import * as fs from 'fs';
@@ -13,11 +14,13 @@ export function activate(context: vscode.ExtensionContext) {
   const dataCodeLensProvider = new DataCodeLensProvider();
   const exportDefaultCodeLensProvider = new ExportDefaultCodeLensProvider();
   const methodCodeLensProvider = new MethodCodeLensProvider();
+  const propCodeLensProvider = new PropCodeLensProvider();
   const watchCodeLensProvider = new WatchCodeLensProvider();
 
   vscode.languages.registerCodeLensProvider("vue", dataCodeLensProvider);
   vscode.languages.registerCodeLensProvider("vue", exportDefaultCodeLensProvider);
   vscode.languages.registerCodeLensProvider("vue", methodCodeLensProvider);
+  vscode.languages.registerCodeLensProvider("vue", propCodeLensProvider);
   vscode.languages.registerCodeLensProvider("vue", watchCodeLensProvider);
 
 
@@ -101,6 +104,80 @@ export function activate(context: vscode.ExtensionContext) {
       }
     } else {
       await vscode.window.showWarningMessage('No name provided for method');
+    }
+  });
+
+  const addProp = vscode.commands.registerCommand('vueSfcEditor.addProp', async () => {
+    const document = vscode.window.activeTextEditor?.document;
+
+    const text: string | undefined = document?.getText();
+
+    const index = text?.indexOf("props:");
+    let tempString: string | undefined;
+    let shouldCreatePropsBlock: boolean;
+    if (index && index >= 0) {
+      tempString = text?.substring(0, index);
+      shouldCreatePropsBlock = false;
+    } else {
+      tempString = text?.substring(0, text.indexOf('export default'));
+      shouldCreatePropsBlock = true;
+    }
+    const lineNumber = tempString?.split('\n').length || 0;
+    const edit: vscode.WorkspaceEdit = new vscode.WorkspaceEdit();
+
+    const state: CreatePropState = {
+      name: 'MyProp',
+      type: 'String',
+      defaultValue: "'asd'",
+      required: true
+    };
+
+    const propName = await vscode.window.showInputBox({
+      prompt: 'Enter prop name',
+      placeHolder: 'foo'
+    });
+
+    if (propName) {
+      state.name = propName;
+
+      const types = await vscode.window.showQuickPick(
+        ['String', 'Number', 'Boolean', 'Object'],
+        { canPickMany: true, placeHolder: 'Select allowed type(s)' }
+      );
+
+      if (types && types.length) {
+        state.type = types?.join(", ");
+
+        const defaultValue = await vscode.window.showInputBox({
+          prompt: 'Enter default value',
+          placeHolder: 'undefined'
+        });
+
+        if (defaultValue) {
+          state.defaultValue = defaultValue;
+
+          const required = await vscode.window.showQuickPick(['Yes', 'No'], {
+            placeHolder: 'Is prop required?'
+          });
+
+          state.required = required?.includes('Yes');
+
+          const code = buildPropCode(state, shouldCreatePropsBlock);
+
+          if (document) {
+            edit.insert(document.uri, new vscode.Position(lineNumber, 0), code);
+            await vscode.workspace.applyEdit(edit);
+            await vscode.workspace.saveAll(false);
+            await vscode.commands.executeCommand('vscode.executeFormatDocumentProvider', document.uri);
+          }
+        } else {
+          await vscode.window.showWarningMessage('No default value specified for prop');
+        }
+      } else {
+        await vscode.window.showWarningMessage('No allowed type specified for prop');
+      }
+    } else {
+      await vscode.window.showWarningMessage('No name provided for prop');
     }
   });
 
@@ -231,6 +308,28 @@ export function activate(context: vscode.ExtensionContext) {
         const edit: vscode.WorkspaceEdit = new vscode.WorkspaceEdit();
 
         const code = `  methods: {\n  },\n`;
+        edit.insert(document.uri, new vscode.Position(lineNumber, 0), code);
+        await vscode.workspace.applyEdit(edit);
+        await vscode.workspace.saveAll(false);
+        await vscode.commands.executeCommand('vscode.executeFormatDocumentProvider', document.uri);
+      }
+    }
+  });
+
+  const addPropsSection = vscode.commands.registerCommand("vueSfcEditor.addPropsSection", async () => {
+    const document = vscode.window.activeTextEditor?.document;
+    if (document) {
+      const text: string | undefined = document?.getText();
+
+      const index = text?.indexOf("export default");
+
+      let tempString: string | undefined;
+      if (index && index >= 0) {
+        tempString = text?.substring(0, index);
+        const lineNumber = tempString?.split('\n').length || 0;
+        const edit: vscode.WorkspaceEdit = new vscode.WorkspaceEdit();
+
+        const code = `  props: {\n  },\n`;
         edit.insert(document.uri, new vscode.Position(lineNumber, 0), code);
         await vscode.workspace.applyEdit(edit);
         await vscode.workspace.saveAll(false);
@@ -385,6 +484,7 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(addDataSection);
   context.subscriptions.push(addMethod);
   context.subscriptions.push(addMethodsSection);
+  context.subscriptions.push(addPropsSection);
   context.subscriptions.push(addWatch);
   context.subscriptions.push(addWatchSection);
   context.subscriptions.push(createNewComponent);

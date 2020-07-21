@@ -23,9 +23,10 @@ export class ExportDefaultCodeLensProvider implements vscode.CodeLensProvider {
     const text = document.getText();
 
     const shouldAddCreated = (text.match('(?<!\\/\\/)created\\s*\\(') || []).length === 0;
-    const shouldAddMethods = (text.match('(?<!\\/\\/)methods\\s*\\:\\s*{') || []).length === 0;
-    const shouldAddWatch = (text.match('(?<!\\/\\/)watch\\s*\\:\\s*{') || []).length === 0;
     const shouldAddData = (text.match('(?<!\\/\\/)data\\s*:*\\s*(function)?\\s*\\(') || []).length === 0;
+    const shouldAddMethods = (text.match('(?<!\\/\\/)methods\\s*\\:\\s*{') || []).length === 0;
+    const shouldAddProps = (text.match('(?<!\\/\\/)props\\s*\\:\\s*{') || []).length === 0;
+    const shouldAddWatch = (text.match('(?<!\\/\\/)watch\\s*\\:\\s*{') || []).length === 0;
 
     if (shouldAddMethods || shouldAddWatch || shouldAddCreated) {
       let matches;
@@ -46,6 +47,13 @@ export class ExportDefaultCodeLensProvider implements vscode.CodeLensProvider {
             this.codeLenses.push(new vscode.CodeLens(range, {
               command: "vueSfcEditor.addMethodsSection",
               title: "Add methods section"
+            }));
+          }
+
+          if (shouldAddProps) {
+            this.codeLenses.push(new vscode.CodeLens(range, {
+              command: "vueSfcEditor.addPropsSection",
+              title: "Add props section"
             }));
           }
 

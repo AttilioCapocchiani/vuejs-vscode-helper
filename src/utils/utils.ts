@@ -1,4 +1,4 @@
-import { AddWatchState, CreateSFCState } from './interfaces';
+import { AddWatchState, CreatePropState, CreateSFCState } from './interfaces';
 import * as fs from 'fs';
 
 export function buildMethodCode(methodName: string, shouldCreateMethodsBlock = false): string {
@@ -6,6 +6,15 @@ export function buildMethodCode(methodName: string, shouldCreateMethodsBlock = f
     return `  methods: {\n    ${methodName} () {\n      return null\n    }\n  },\n`;
   } else {
     return `    ${methodName} () { \n      return null \n    },\n`;
+  }
+}
+
+export function buildPropCode(state: CreatePropState, shouldCreateMethodsBlock = false): string {
+  const code = `    ${state.name}: { \n      type: [${state.type}],\n      defaultValue: ${state.defaultValue},\n      required: ${state.required}\n    },\n`;
+  if (shouldCreateMethodsBlock) {
+    return `  props: {\n    ${code},\n`;
+  } else {
+    return code;
   }
 }
 

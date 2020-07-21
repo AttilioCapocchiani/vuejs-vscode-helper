@@ -18,3 +18,10 @@ export interface CreateSFCState {
   hasTemplate: boolean | undefined,
   stylePreProcessor: string | undefined
 }
+
+export interface CreatePropState {
+  defaultValue: string | undefined
+  name: string | undefined
+  required : boolean | undefined
+  type: string | undefined
+}
