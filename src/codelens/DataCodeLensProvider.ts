@@ -33,21 +33,12 @@ export class DataCodeLensProvider implements vscode.CodeLensProvider {
           title: 'Add a new reactive variable'
         }));
 
-        this.codeLenses.push(new vscode.CodeLens(range, {
-          command: 'vueSfcEditor.sortData',
-          title: 'Sort'
-        }));
+        // this.codeLenses.push(new vscode.CodeLens(range, {
+        //   command: 'vueSfcEditor.sortData',
+        //   title: 'Sort'
+        // }));
       }
     }
     return this.codeLenses;
-  }
-
-  public resolveCodeLens(codeLens: vscode.CodeLens, token: vscode.CancellationToken) {
-    codeLens.command = {
-      title: "Add reactive variable",
-      tooltip: "Add a new reactive variable",
-      command: "vueSfcEditor.addData"
-    };
-    return codeLens;
   }
 }

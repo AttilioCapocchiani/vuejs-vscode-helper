@@ -2,7 +2,7 @@
 	"name": "vuejs-helper",
 	"displayName": "VueJS helper",
 	"description": "VueJS Helper for VS Code",
-	"version": "1.0.1",
+	"version": "1.0.5",
 	"publisher": "AttilioCapocchiani",
 	"repository": "https://github.com/AttilioCapocchiani/vuejs-vscode-helper",
 	"engines": {
