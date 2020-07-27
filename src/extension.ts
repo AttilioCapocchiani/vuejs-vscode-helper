@@ -1,14 +1,13 @@
 import * as vscode from 'vscode';
-import { buildMethodCode, buildWatchCode, buildPropCode, createSFC, extractObject, regexIndexOf } from './utils/utils';
-import { AddDataState, AddWatchState, CreatePropState, CreateSFCState } from './utils/interfaces';
+import { buildDataCode, buildMethodCode, buildWatchCode, buildPropCode, createSFC, detectLanguage, extractObject, regexIndexOf } from './utils/utils';
+import { AddDataState, AddMethodState, AddPropState, AddWatchState, CreateSFCState } from './utils/interfaces';
 
 import { DataCodeLensProvider } from './codelens/DataCodeLensProvider';
 import { ExportDefaultCodeLensProvider } from './codelens/ExportDefaultCodeLensProvider';
 import { MethodCodeLensProvider } from './codelens/MethodCodeLensProvider';
 import { PropCodeLensProvider } from './codelens/PropCodeLensProvider';
 import { WatchCodeLensProvider } from './codelens/WatchCodeLensProvider';
-
-import * as fs from 'fs';
+import { statSync } from 'fs';
 
 export function activate(context: vscode.ExtensionContext) {
   const dataCodeLensProvider = new DataCodeLensProvider();
@@ -23,7 +22,6 @@ export function activate(context: vscode.ExtensionContext) {
   vscode.languages.registerCodeLensProvider("vue", propCodeLensProvider);
   vscode.languages.registerCodeLensProvider("vue", watchCodeLensProvider);
 
-
   const addData = vscode.commands.registerCommand("vueSfcEditor.addData", async () => {
     const document = vscode.window.activeTextEditor?.document;
     if (document) {
@@ -33,39 +31,46 @@ export function activate(context: vscode.ExtensionContext) {
       const index = regexIndexOf(text, /return\s+\{/, dataIndex);
 
       let tempString: string | undefined;
+      let shouldCreateDataFunction: boolean;
+
       if (index && index >= 0) {
         tempString = text?.substring(0, index);
-        const lineNumber = tempString?.split('\n').length || 0;
-        const edit: vscode.WorkspaceEdit = new vscode.WorkspaceEdit();
+        shouldCreateDataFunction = false;
+      } else {
+        tempString = text?.substring(0, text.indexOf('export default'));
+        shouldCreateDataFunction = true;
+      }
+      const lineNumber = tempString?.split('\n').length || 0;
+      const edit: vscode.WorkspaceEdit = new vscode.WorkspaceEdit();
 
-        const addDataState: AddDataState = {
-          variableName: '',
-          defaultValue: 'undefined'
-        };
+      const addDataState: AddDataState = {
+        variableName: '',
+        defaultValue: 'undefined',
+        language: detectLanguage(text)
+      };
 
-        const variableName = await vscode.window.showInputBox({
-          prompt: 'Enter variable name',
-          placeHolder: 'foo'
+      const variableName = await vscode.window.showInputBox({
+        prompt: 'Enter variable name',
+        placeHolder: 'foo'
+      });
+
+      if (variableName) {
+        addDataState.variableName = variableName;
+
+        const defaultValue = await vscode.window.showInputBox({
+          prompt: 'Default value',
+          placeHolder: 'undefined'
         });
 
-        if (variableName) {
-          addDataState.variableName = variableName;
-
-          const defaultValue = await vscode.window.showInputBox({
-            prompt: 'Default value',
-            placeHolder: 'undefined'
-          });
-
-          if (defaultValue) {
-            addDataState.defaultValue = defaultValue;
-          }
-
-          const code = `      ${addDataState.variableName}: ${addDataState.defaultValue},\n`;
-          edit.insert(document.uri, new vscode.Position(lineNumber, 0), code);
-          await vscode.workspace.applyEdit(edit);
-          await vscode.workspace.saveAll(false);
-          await vscode.commands.executeCommand('vscode.executeFormatDocumentProvider', document.uri);
+        if (defaultValue) {
+          addDataState.defaultValue = defaultValue;
         }
+
+        const code = buildDataCode(addDataState, shouldCreateDataFunction);
+        edit.insert(document.uri, new vscode.Position(lineNumber, 0), code);
+        await vscode.workspace.applyEdit(edit);
+        await vscode.workspace.saveAll(false);
+        await vscode.commands.executeCommand('vscode.executeFormatDocumentProvider', document.uri);
       }
     }
   });
@@ -88,13 +93,19 @@ export function activate(context: vscode.ExtensionContext) {
     const lineNumber = tempString?.split('\n').length || 0;
     const edit: vscode.WorkspaceEdit = new vscode.WorkspaceEdit();
 
+    const state: AddMethodState = {
+      methodName: '',
+      language: detectLanguage(text!)
+    };
+
     const methodName = await vscode.window.showInputBox({
       prompt: 'Enter method name',
       placeHolder: 'myMethod'
     });
 
     if (methodName) {
-      const code = buildMethodCode(methodName, shouldCreateMethodsBlock);
+      state.methodName = methodName;
+      const code = buildMethodCode(state, shouldCreateMethodsBlock);
 
       if (document) {
         edit.insert(document.uri, new vscode.Position(lineNumber, 0), code);
@@ -125,11 +136,12 @@ export function activate(context: vscode.ExtensionContext) {
     const lineNumber = tempString?.split('\n').length || 0;
     const edit: vscode.WorkspaceEdit = new vscode.WorkspaceEdit();
 
-    const state: CreatePropState = {
-      name: 'MyProp',
-      type: 'String',
-      defaultValue: "'asd'",
-      required: true
+    const state: AddPropState = {
+      name: '',
+      type: '',
+      defaultValue: "",
+      required: false,
+      language: detectLanguage(text!)
     };
 
     const propName = await vscode.window.showInputBox({
@@ -140,28 +152,52 @@ export function activate(context: vscode.ExtensionContext) {
     if (propName) {
       state.name = propName;
 
-      const types = await vscode.window.showQuickPick(
-        ['String', 'Number', 'Boolean', 'Object'],
-        { canPickMany: true, placeHolder: 'Select allowed type(s)' }
-      );
+      if (state.language === 'js') {
+        const types = await vscode.window.showQuickPick(
+          ['String', 'Number', 'Boolean', 'Object'],
+          { canPickMany: true, placeHolder: 'Select allowed type(s)' }
+        );
 
-      if (types && types.length) {
-        state.type = types?.join(", ");
+        if (types && types.length) {
+          state.type = types?.join(", ");
 
-        const defaultValue = await vscode.window.showInputBox({
-          prompt: 'Enter default value',
-          placeHolder: 'undefined'
-        });
-
-        if (defaultValue) {
-          state.defaultValue = defaultValue;
-
-          const required = await vscode.window.showQuickPick(['Yes', 'No'], {
-            placeHolder: 'Is prop required?'
+          const defaultValue = await vscode.window.showInputBox({
+            prompt: 'Enter default value',
+            placeHolder: 'undefined'
           });
 
-          state.required = required?.includes('Yes');
+          if (defaultValue) {
+            state.defaultValue = defaultValue;
 
+            const required = await vscode.window.showQuickPick(['Yes', 'No'], {
+              placeHolder: 'Is prop required?'
+            });
+
+            state.required = required?.includes('Yes');
+
+            const code = buildPropCode(state, shouldCreatePropsBlock);
+
+            if (document) {
+              edit.insert(document.uri, new vscode.Position(lineNumber, 0), code);
+              await vscode.workspace.applyEdit(edit);
+              await vscode.workspace.saveAll(false);
+              await vscode.commands.executeCommand('vscode.executeFormatDocumentProvider', document.uri);
+            }
+          } else {
+            await vscode.window.showWarningMessage('No default value specified for prop');
+          }
+        } else {
+          await vscode.window.showWarningMessage('No allowed type specified for prop');
+        }
+      } else {
+        const type = await vscode.window.showInputBox({
+          prompt: 'Enter prop type',
+          placeHolder: 'Foo'
+        });
+
+        if (type) {
+          state.type = type;
+          
           const code = buildPropCode(state, shouldCreatePropsBlock);
 
           if (document) {
@@ -171,10 +207,8 @@ export function activate(context: vscode.ExtensionContext) {
             await vscode.commands.executeCommand('vscode.executeFormatDocumentProvider', document.uri);
           }
         } else {
-          await vscode.window.showWarningMessage('No default value specified for prop');
+          await vscode.window.showWarningMessage('No allowed type specified for prop');
         }
-      } else {
-        await vscode.window.showWarningMessage('No allowed type specified for prop');
       }
     } else {
       await vscode.window.showWarningMessage('No name provided for prop');
@@ -202,7 +236,9 @@ export function activate(context: vscode.ExtensionContext) {
     const addWatchState: AddWatchState = {
       variableName: '',
       hasOldValue: false,
-      hasNewValue: false
+      hasNewValue: false,
+      methodName: '',
+      language: detectLanguage(text!)
     };
 
     const variableName = await vscode.window.showInputBox({
@@ -224,6 +260,17 @@ export function activate(context: vscode.ExtensionContext) {
           placeHolder: 'Include old value as parameter?'
         });
         addWatchState.hasOldValue = hasOldValueInput?.includes('Yes');
+      }
+
+      if (addWatchState.language === 'ts') {
+        const methodName = await vscode.window.showInputBox({
+          prompt: 'Enter method name',
+          placeHolder: 'onFooChange'
+        });
+
+        if (methodName) {
+          addWatchState.methodName = methodName;
+        }
       }
 
       const code = buildWatchCode(addWatchState, shouldCreateWatchBlock);
@@ -374,7 +421,13 @@ export function activate(context: vscode.ExtensionContext) {
           const lineNumber = tempString?.split('\n').length || 0;
           const edit: vscode.WorkspaceEdit = new vscode.WorkspaceEdit();
 
-          const code = `  created () {\n  },\n`;
+          let code = `  created () {\n  }`;
+          if (detectLanguage(text) === 'js') {
+            code += ',\n';
+          } else {
+            code += '\n';
+          }
+
           edit.insert(document.uri, new vscode.Position(lineNumber, 0), code);
           await vscode.workspace.applyEdit(edit);
           await vscode.workspace.saveAll(false);
@@ -418,6 +471,7 @@ export function activate(context: vscode.ExtensionContext) {
       createFolder: false,
       fileName: '',
       isStyleScoped: false,
+      language: '',
       hasStyle: false,
       hasTemplate: false,
       stylePreProcessor: ''
@@ -436,14 +490,24 @@ export function activate(context: vscode.ExtensionContext) {
         state.fileName = `${componentName}.vue`;
       }
 
-      const options = await vscode.window.showQuickPick(
-        ['Add <template>', 'Add <style>', 'Create folder'],
-        { canPickMany: true }
-      );
-
       const document = vscode.window.activeTextEditor?.document;
       if (document) {
         const path = document.uri.path;
+
+        const items: vscode.QuickPickItem[] = [
+          { label: 'Add <template>', picked: false, description: 'Add template tag' },
+          { label: 'Add <style>', picked: false, description: 'Add style tag. A separate prompt will ask for pre-processor' },
+          { label: 'Create folder', picked: false, description: 'Create component in a separate folder with same name' },
+          { label: 'Use TypeScript', picked: detectLanguage(document!.getText()) === 'ts', description: 'Use TypeScript as component language' },
+        ];
+
+        const options = (await vscode.window.showQuickPick(items, { canPickMany: true }))?.map(o => o.label);
+
+        if (options!.includes('Use TypeScript')) {
+          state.language = 'ts';
+        } else {
+          state.language = 'js';
+        }
 
         if (options!.includes('Create folder')) {
           state.createFolder = true;
@@ -471,9 +535,8 @@ export function activate(context: vscode.ExtensionContext) {
         }
 
         createSFC(state, path);
-      }
 
-      console.log(options);
+      }
     }
 
   });
@@ -484,6 +547,7 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(addDataSection);
   context.subscriptions.push(addMethod);
   context.subscriptions.push(addMethodsSection);
+  context.subscriptions.push(addProp);
   context.subscriptions.push(addPropsSection);
   context.subscriptions.push(addWatch);
   context.subscriptions.push(addWatchSection);

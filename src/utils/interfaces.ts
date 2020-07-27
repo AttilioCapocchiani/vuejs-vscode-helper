@@ -1,12 +1,28 @@
+export interface AddDataState {
+  variableName: string | undefined
+  defaultValue: string | undefined
+  language: string | undefined
+}
+
+export interface AddMethodState {
+  methodName: string | undefined
+  language: string | undefined
+}
+
+export interface AddPropState {
+  defaultValue: string | undefined
+  name: string | undefined
+  required : boolean | undefined
+  type: string | undefined
+  language: string | undefined
+}
+
 export interface AddWatchState {
   variableName: string | undefined
   hasOldValue: boolean | undefined
   hasNewValue: boolean | undefined
-}
-
-export interface AddDataState {
-  variableName: string | undefined
-  defaultValue: string | undefined
+  methodName: string | undefined
+  language: string | undefined
 }
 
 export interface CreateSFCState {
@@ -17,11 +33,6 @@ export interface CreateSFCState {
   hasStyle: boolean | undefined
   hasTemplate: boolean | undefined,
   stylePreProcessor: string | undefined
+  language: string | undefined
 }
 
-export interface CreatePropState {
-  defaultValue: string | undefined
-  name: string | undefined
-  required : boolean | undefined
-  type: string | undefined
-}
