@@ -20,6 +20,9 @@ Included commands are the following ![Commands](asset/commands.png)
     ![Wizard](asset/tags.PNG)
     ![Pre-processors](asset/pre-processors.png)
 
+## TypeScript
+This extension also supports TS Single File Components. It automatically detects the component language and automatically adapts!
+
 
 ## Code actions
 The extension allows also to easily add `methods`, `data` and `watch` from each section in the Single File Component. 

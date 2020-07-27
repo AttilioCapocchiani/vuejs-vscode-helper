@@ -1,44 +1,38 @@
-import { AddWatchState, CreatePropState, CreateSFCState } from './interfaces';
+import { AddDataState, AddMethodState, AddPropState, AddWatchState, CreateSFCState } from './interfaces';
+import * as js from './js/jsCodeGenerator';
+import * as ts from './ts/tsCodeGenerator';
 import * as fs from 'fs';
 
-export function buildMethodCode(methodName: string, shouldCreateMethodsBlock = false): string {
-  if (shouldCreateMethodsBlock) {
-    return `  methods: {\n    ${methodName} () {\n      return null\n    }\n  },\n`;
+export function buildDataCode(state: AddDataState, shouldCreateDataBlock: boolean): string {
+  if (state.language === 'js') {
+    return js.buildDataCode(state, shouldCreateDataBlock);
   } else {
-    return `    ${methodName} () { \n      return null \n    },\n`;
+    return ts.buildDataCode(state);
   }
 }
 
-export function buildPropCode(state: CreatePropState, shouldCreateMethodsBlock = false): string {
-  const code = `    ${state.name}: { \n      type: [${state.type}],\n      defaultValue: ${state.defaultValue},\n      required: ${state.required}\n    },\n`;
-  if (shouldCreateMethodsBlock) {
-    return `  props: {\n    ${code},\n`;
+export function buildMethodCode(state: AddMethodState, shouldCreateMethodsBlock = false): string {
+  if (state.language === 'js') {
+    return js.buildMethodCode(state, shouldCreateMethodsBlock);
   } else {
-    return code;
+    return ts.buildMethodCode(state);
+  }
+}
+
+export function buildPropCode(state: AddPropState, shouldCreateMethodsBlock = false): string {
+  if (state.language === 'js') {
+    return js.buildPropCode(state, shouldCreateMethodsBlock);
+  } else {
+    return ts.buildPropCode(state);
   }
 }
 
 export function buildWatchCode(state: AddWatchState, shouldCreateWatchBlock = false): string {
-  let code: string;
-  let signature = `${state.variableName} (`;
-
-  if (state.hasNewValue) {
-    signature += 'newValue';
-  }
-
-  if (state.hasOldValue) {
-    signature += ', oldValue';
-  }
-
-  signature += ')';
-
-  if (shouldCreateWatchBlock) {
-    code = `  watch: {\n    ${signature} {\n      return null\n    }\n  },\n`;
+  if (state.language === 'js') {
+    return js.buildWatchCode(state, shouldCreateWatchBlock);
   } else {
-    code = `    ${signature} { \n      return null \n    },\n`;
+    return ts.buildWatchCode(state);
   }
-
-  return code;
 }
 
 export function regexIndexOf(string: string, regex: RegExp, startPosition: number): number {
@@ -78,19 +72,17 @@ export function createSFC(state: CreateSFCState, currentPath: string) {
 }
 
 function getSFCCode(state: CreateSFCState): string {
-  let code = "";
-  
-  if (state.hasTemplate) {
-    code += "<template>\n</template>\n";  
+  if (state.language === 'js') {
+    return js.createSFCCode(state);
+  } else {
+    return ts.createSFCCode(state);
   }
-  code += `<script>\nexport default {\n}\n</script>`;
-  if (state.hasStyle) {
-    let preProcessor = '';
-    if (state.stylePreProcessor !== 'None') {
-      preProcessor = ` lang="${state.stylePreProcessor}"`;
-    }
-    code += `\n<style${preProcessor}${state.isStyleScoped? ' scoped': ''}>\n</style>`;
-  }
+}
 
-  return code;
+export function detectLanguage (code: string) {
+  if (code.match(/<script\s+lang\s*=\s*"ts"\s*>/)) {
+    return 'ts';
+  } else {
+    return 'js';
+  }
 }

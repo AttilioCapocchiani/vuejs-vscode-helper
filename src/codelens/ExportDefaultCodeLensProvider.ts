@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { detectLanguage } from '../utils/utils';
 
 /**
  * ExportDefaultCodeLensProvider
@@ -11,7 +12,7 @@ export class ExportDefaultCodeLensProvider implements vscode.CodeLensProvider {
 
   constructor() {
     this.regex = /export default/g;
-
+    
     vscode.workspace.onDidChangeConfiguration((_) => {
       this._onDidChangeCodeLenses.fire();
     });
@@ -21,12 +22,13 @@ export class ExportDefaultCodeLensProvider implements vscode.CodeLensProvider {
     this.codeLenses = [];
     const regex = new RegExp(this.regex);
     const text = document.getText();
+    const isJS = detectLanguage(text) === 'js';
 
     const shouldAddCreated = (text.match('(?<!\\/\\/)created\\s*\\(') || []).length === 0;
-    const shouldAddData = (text.match('(?<!\\/\\/)data\\s*:*\\s*(function)?\\s*\\(') || []).length === 0;
-    const shouldAddMethods = (text.match('(?<!\\/\\/)methods\\s*\\:\\s*{') || []).length === 0;
-    const shouldAddProps = (text.match('(?<!\\/\\/)props\\s*\\:\\s*{') || []).length === 0;
-    const shouldAddWatch = (text.match('(?<!\\/\\/)watch\\s*\\:\\s*{') || []).length === 0;
+    const shouldAddData = isJS && (text.match('(?<!\\/\\/)data\\s*:*\\s*(function)?\\s*\\(') || []).length === 0;
+    const shouldAddMethods = isJS && (text.match('(?<!\\/\\/)methods\\s*\\:\\s*{') || []).length === 0;
+    const shouldAddProps = isJS && (text.match('(?<!\\/\\/)props\\s*\\:\\s*{') || []).length === 0;
+    const shouldAddWatch = isJS && (text.match('(?<!\\/\\/)watch\\s*\\:\\s*{') || []).length === 0;
 
     if (shouldAddMethods || shouldAddWatch || shouldAddCreated) {
       let matches;

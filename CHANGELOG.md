@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.2
+- Added support for TypeScript component. Create components, add watches, props and data from commands!
+
 ## 1.1
 - Added support for props creation
 
