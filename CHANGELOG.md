@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.2.1
+- Fixed prop generation code in Vue2 js components
+
 ## 1.2
 - Added support for TypeScript component. Create components, add watches, props and data from commands!
 
