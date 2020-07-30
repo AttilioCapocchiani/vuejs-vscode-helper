@@ -33,9 +33,10 @@ export function buildMethodCode(state: AddMethodState, shouldCreateMethodsBlock 
 }
 
 export function buildPropCode(state: AddPropState, shouldCreateMethodsBlock = false): string {
-  const code = `    ${state.name}: { \n      type: [${state.type}],\n      defaultValue: ${state.defaultValue},\n      required: ${state.required}\n    },\n`;
+  const type = state.type?.length === 1 ? state.type : `[${state.type}]`;
+  const code = `    ${state.name}: { \n      type: ${type},\n      default: ${state.defaultValue},\n      required: ${state.required}\n    },\n`;
   if (shouldCreateMethodsBlock) {
-    return `  props: {\n    ${code},\n`;
+    return `  props: {\n${code}\n  },\n`;
   } else {
     return code;
   }

@@ -13,7 +13,7 @@ export interface AddPropState {
   defaultValue: string | undefined
   name: string | undefined
   required : boolean | undefined
-  type: string | undefined
+  type: string[] | string | undefined
   language: string | undefined
 }
 
