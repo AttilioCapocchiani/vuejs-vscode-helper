@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.2.2
+- Fixed components generation under Windows
+
 ## 1.2.1
 - Fixed prop generation code in Vue2 js components
 
