@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { CreateSFCState } from '../utils/interfaces';
-import { createSFC } from '../utils/utils';
+import { createSFC, detectLanguage } from '../utils/utils';
+import * as os from 'os'
 
 export async function createComponentCommand () {
   const state: CreateSFCState = {
@@ -19,6 +20,7 @@ export async function createComponentCommand () {
     placeHolder: 'MyComponent'
   });
 
+
   if (componentName) {
     state.componentName = componentName;
     if (componentName.includes('.vue')) {
@@ -29,7 +31,11 @@ export async function createComponentCommand () {
 
     const document = vscode.window.activeTextEditor?.document;
     if (document) {
-      const path = document.uri.path;
+      let path = document.uri.path;
+
+      if (os.platform() === 'win32' && path.startsWith('/')) {
+        path = path.substring(1)
+      }
 
       const items: vscode.QuickPickItem[] = [
         { label: 'Add <template>', picked: false, description: 'Add template tag' },
