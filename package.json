@@ -58,6 +58,10 @@
 				"title": "Vue SFC Editor: Create SFC"
 			},
 			{
+				"command": "vueSfcEditor.mapVuexAction",
+				"title": "Vue SFC Editor: Map Vuex action"
+			},
+			{
 				"command": "vueSfcEditor.sortData",
 				"title": "Vue SFC Editor: Sort Data"
 			}
@@ -102,6 +106,10 @@
 				},
 				{
 					"command": "vueSfcEditor.createComponent",
+					"when": "editorLangId == vue"
+				},
+				{
+					"command": "vueSfcEditor.mapVuexAction",
 					"when": "editorLangId == vue"
 				},
 				{

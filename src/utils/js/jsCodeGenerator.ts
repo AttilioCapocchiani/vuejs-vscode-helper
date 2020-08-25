@@ -1,4 +1,4 @@
-import { AddDataState, AddMethodState, AddPropState, AddWatchState, CreateSFCState } from '../interfaces';
+import { AddDataState, AddMethodState, AddPropState, AddWatchState, CreateSFCState, MapVuexActionState } from '../interfaces';
 export function createSFCCode(state: CreateSFCState): string {
   let code = "";
 
@@ -60,6 +60,27 @@ export function buildWatchCode(state: AddWatchState, shouldCreateWatchBlock = fa
     code = `  watch: {\n    ${signature} {\n      return null\n    }\n  },\n`;
   } else {
     code = `    ${signature} { \n      return null \n    },\n`;
+  }
+
+  return code;
+}
+
+export function buildMapVuexActionCode(state: MapVuexActionState, shouldCreateMethodsBlock = false, shouldCreateMapActionsBlock = false): string {
+  let code: string;
+
+  let entryName: string;
+  if (state.actionName === state.mappedName) {
+    entryName = `'${state.actionName}'`;
+  } else {
+    entryName = `{${state.mappedName}: '${state.actionName}'}`;
+  }
+  
+  if (shouldCreateMethodsBlock) {
+    code = `  methods: {\n    ...mapActions([\n      ${entryName}\n    ])\n  },\n`;
+  } else if (shouldCreateMapActionsBlock) {
+    code = `    ...mapActions([\n      ${entryName}\n    ]),\n`;
+  } else {
+    code = `      ${entryName},\n`;
   }
 
   return code;

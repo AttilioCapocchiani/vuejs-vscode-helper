@@ -28,18 +28,18 @@ export class MethodCodeLensProvider implements vscode.CodeLensProvider {
       const position = new vscode.Position(line.lineNumber, indexOf);
       const range = document.getWordRangeAtPosition(position, new RegExp(this.regex));
       if (range) {
-        this.codeLenses.push(new vscode.CodeLens(range));
+        this.codeLenses.push(new vscode.CodeLens(range, {
+          title: "Add method",
+          tooltip: "Add a new method",
+          command: "vueSfcEditor.addMethod"
+        }));
+        this.codeLenses.push(new vscode.CodeLens(range, {
+          title: "Map Vuex action",
+          tooltip: "Map a Vuex action in methods",
+          command: "vueSfcEditor.mapVuexAction"
+        }));
       }
     }
     return this.codeLenses;
-  }
-
-  public resolveCodeLens(codeLens: vscode.CodeLens, token: vscode.CancellationToken) {
-    codeLens.command = {
-      title: "Add method",
-      tooltip: "Add a new method",
-      command: "vueSfcEditor.addMethod"
-    };
-    return codeLens;
   }
 }

@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { buildDataCode, detectLanguage, regexIndexOf } from '../utils/utils';
+import { buildDataCode, detectLanguage, regexIndexOf } from '../utils/utils';
 import { AddDataState } from '../utils/interfaces';
 
 export async function addDataCommand() {

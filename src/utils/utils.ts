@@ -1,4 +1,4 @@
-import { AddDataState, AddMethodState, AddPropState, AddWatchState, CreateSFCState } from './interfaces';
+import { AddDataState, AddMethodState, AddPropState, AddWatchState, CreateSFCState, MapVuexActionState} from './interfaces';
 import * as js from './js/jsCodeGenerator';
 import * as ts from './ts/tsCodeGenerator';
 import * as fs from 'fs';
@@ -69,6 +69,14 @@ export function createSFC(state: CreateSFCState, currentPath: string) {
 
   fs.mkdirSync(folderName, { recursive: true });
   fs.appendFileSync(pathArray.join("/"), getSFCCode(state));
+}
+
+export function buildMapVuexActionCode(state: MapVuexActionState, shouldCreateMethodsBlock = false, shouldCreateMapActionsBlock = false): string {
+  if (state.language === 'js') {
+    return js.buildMapVuexActionCode(state, shouldCreateMethodsBlock, shouldCreateMapActionsBlock);
+  } else {
+    return '';
+  }
 }
 
 function getSFCCode(state: CreateSFCState): string {

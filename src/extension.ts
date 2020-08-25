@@ -17,6 +17,7 @@ import { addWatchSectionCommand } from './commands/addWatchSection';
 import { addCreatedSectionCommand } from './commands/addCreatedSection';
 import { addDataSectionCommand } from './commands/addDataSection';
 import { createComponentCommand } from './commands/createComponent';
+import { mapVuexActionCommand } from './commands/mapVuex';
 
 export function activate(context: vscode.ExtensionContext) {
   const dataCodeLensProvider = new DataCodeLensProvider();
@@ -47,6 +48,9 @@ export function activate(context: vscode.ExtensionContext) {
   // Wizard
   const createNewComponent = vscode.commands.registerCommand("vueSfcEditor.createComponent", createComponentCommand);
 
+  // Vuex
+  const mapVuexAction = vscode.commands.registerCommand("vueSfcEditor.mapVuexAction", mapVuexActionCommand);
+
   context.subscriptions.push(addCreatedSection);
   context.subscriptions.push(addData);
   context.subscriptions.push(addDataSection);
@@ -57,5 +61,6 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(addWatch);
   context.subscriptions.push(addWatchSection);
   context.subscriptions.push(createNewComponent);
+  context.subscriptions.push(mapVuexAction);
   context.subscriptions.push(sortData);
 }

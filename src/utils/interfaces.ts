@@ -36,3 +36,8 @@ export interface CreateSFCState {
   language: string | undefined
 }
 
+export interface MapVuexActionState {
+  actionName: string | undefined
+  mappedName: string | undefined
+  language: string | undefined
+}
