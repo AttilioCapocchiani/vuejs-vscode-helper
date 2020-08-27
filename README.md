@@ -2,7 +2,11 @@
 
 ![demo](asset/demo.gif)
 
-This extension allows a quick development when using VueJS.
+This extension allows a quick development when using VueJS. 
+
+You can find extension at this link https://marketplace.visualstudio.com/items?itemName=AttilioCapocchiani.vuejs-helper
+
+Source code is open source and can be found at this link https://github.com/AttilioCapocchiani/vuejs-vscode-helper
 
 Included commands are the following ![Commands](asset/commands.png)
 
