@@ -75,7 +75,7 @@ export function buildMapVuexActionCode(state: MapVuexActionState, shouldCreateMe
   if (state.language === 'js') {
     return js.buildMapVuexActionCode(state, shouldCreateMethodsBlock, shouldCreateMapActionsBlock);
   } else {
-    return '';
+    throw new Error('Unsupported operation for ts components');
   }
 }
 
