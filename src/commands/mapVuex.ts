@@ -63,8 +63,11 @@ async function insertVuexActionMapping(text: string, document: vscode.TextDocume
       await vscode.workspace.applyEdit(edit);
       await vscode.workspace.saveAll(false);
       await vscode.commands.executeCommand('vscode.executeFormatDocumentProvider', document.uri);
+      return true;
     }
+    return false;
   }
+  return false;
 }
 
 async function insertImportVuexMethods(document: vscode.TextDocument, text: string, mappers: string[]) {
@@ -139,8 +142,12 @@ async function insertVuexGetterMapping(text: string, document: vscode.TextDocume
       await vscode.workspace.applyEdit(edit);
       await vscode.workspace.saveAll(false);
       await vscode.commands.executeCommand('vscode.executeFormatDocumentProvider', document.uri);
+
+      return true;
     }
+    return false;
   }
+  return false;
 }
 
 export async function mapVuexActionCommand() {
@@ -151,14 +158,16 @@ export async function mapVuexActionCommand() {
   if (document) {
     const text: string | undefined = document?.getText();
 
-    await insertVuexActionMapping(text, document);
-    const mappers = [];
-    if (!text.match(mapActionsRegex)) {
-      mappers.push('mapActions');
-    }
+    const inserted = await insertVuexActionMapping(text, document);
+    if (inserted) {
+      const mappers = [];
+      if (!text.match(mapActionsRegex)) {
+        mappers.push('mapActions');
+      }
 
-    if (mappers.length) {
-      await insertImportVuexMethods(document, text, mappers);
+      if (mappers.length) {
+        await insertImportVuexMethods(document, text, mappers);
+      }
     }
   }
 }
@@ -171,14 +180,16 @@ export async function mapVuexGetterCommand() {
   if (document) {
     const text: string | undefined = document?.getText();
 
-    await insertVuexGetterMapping(text, document);
-    const mappers = [];
-    if (!text.match(mapGettersRegex)) {
-      mappers.push('mapGetters');
-    }
+    const inserted = await insertVuexGetterMapping(text, document);
+    if (inserted) {
+      const mappers = [];
+      if (!text.match(mapGettersRegex)) {
+        mappers.push('mapGetters');
+      }
 
-    if (mappers.length) {
-      await insertImportVuexMethods(document, text, mappers);
+      if (mappers.length) {
+        await insertImportVuexMethods(document, text, mappers);
+      }
     }
   }
 }
