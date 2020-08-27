@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3
+- Added support for Vuex actions mapping in `methods` section
+- Added support for Vuex getters mapping in `computed` section
+
 ## 1.2.2
 - Fixed components generation under Windows
 

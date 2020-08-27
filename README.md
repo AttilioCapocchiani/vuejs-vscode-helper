@@ -24,6 +24,13 @@ Included commands are the following ![Commands](asset/commands.png)
     ![Wizard](asset/tags.PNG)
     ![Pre-processors](asset/pre-processors.png)
 
+## Vuex
+This extension allows also to quickly map your Vuex actions/getters in your component! Use the actions on `computed` or `methods`. It also supports namespaced Vuex modules
+
+### Demo
+![Vuex getters](asset/demo-vuex-getters.gif)
+![Vuex actions](asset/demo-vuex-actions.gif)
+
 ## TypeScript
 This extension also supports TS Single File Components. It automatically detects the component language and automatically adapts!
 
