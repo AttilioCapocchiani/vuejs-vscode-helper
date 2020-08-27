@@ -1,4 +1,4 @@
-import { AddDataState, AddMethodState, AddPropState, AddWatchState, CreateSFCState, MapVuexActionState} from './interfaces';
+import { AddDataState, AddMethodState, AddPropState, AddWatchState, CreateSFCState, MapVuexActionState, MapVuexGetterState } from './interfaces';
 import * as js from './js/jsCodeGenerator';
 import * as ts from './ts/tsCodeGenerator';
 import * as fs from 'fs';
@@ -74,6 +74,14 @@ export function createSFC(state: CreateSFCState, currentPath: string) {
 export function buildMapVuexActionCode(state: MapVuexActionState, shouldCreateMethodsBlock = false, shouldCreateMapActionsBlock = false): string {
   if (state.language === 'js') {
     return js.buildMapVuexActionCode(state, shouldCreateMethodsBlock, shouldCreateMapActionsBlock);
+  } else {
+    throw new Error('Unsupported operation for ts components');
+  }
+}
+
+export function buildMapVuexGetterCode(state: MapVuexGetterState, shouldCreateMethodsBlock = false, shouldCreateMapActionsBlock = false): string {
+  if (state.language === 'js') {
+    return js.buildMapVuexGetterCode(state, shouldCreateMethodsBlock, shouldCreateMapActionsBlock);
   } else {
     throw new Error('Unsupported operation for ts components');
   }

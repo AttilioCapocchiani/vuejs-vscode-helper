@@ -1,4 +1,4 @@
-import { AddDataState, AddMethodState, AddPropState, AddWatchState, CreateSFCState, MapVuexActionState } from '../interfaces';
+import { AddDataState, AddMethodState, AddPropState, AddWatchState, CreateSFCState, MapVuexActionState, MapVuexGetterState } from '../interfaces';
 export function createSFCCode(state: CreateSFCState): string {
   let code = "";
 
@@ -72,13 +72,34 @@ export function buildMapVuexActionCode(state: MapVuexActionState, shouldCreateMe
   if (state.actionName === state.mappedName) {
     entryName = `'${state.actionName}'`;
   } else {
-    entryName = `{${state.mappedName}: '${state.actionName}'}`;
+    entryName = `{ ${state.mappedName}: '${state.actionName}' }`;
   }
   
   if (shouldCreateMethodsBlock) {
     code = `  methods: {\n    ...mapActions([\n      ${entryName}\n    ])\n  },\n`;
   } else if (shouldCreateMapActionsBlock) {
     code = `    ...mapActions([\n      ${entryName}\n    ]),\n`;
+  } else {
+    code = `      ${entryName},\n`;
+  }
+
+  return code;
+}
+
+export function buildMapVuexGetterCode(state: MapVuexGetterState, shouldCreateMethodsBlock = false, shouldCreateMapGettersBlock = false): string {
+  let code: string;
+
+  let entryName: string;
+  if (state.getterName === state.mappedName) {
+    entryName = `'${state.getterName}'`;
+  } else {
+    entryName = `{ ${state.mappedName}: '${state.getterName}' }`;
+  }
+  
+  if (shouldCreateMethodsBlock) {
+    code = `  computed: {\n    ...mapGetters([\n      ${entryName}\n    ])\n  },\n`;
+  } else if (shouldCreateMapGettersBlock) {
+    code = `    ...mapGetters([\n      ${entryName}\n    ]),\n`;
   } else {
     code = `      ${entryName},\n`;
   }

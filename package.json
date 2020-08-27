@@ -62,6 +62,10 @@
 				"title": "Vue SFC Editor: Map Vuex action"
 			},
 			{
+				"command": "vueSfcEditor.mapVuexGetter",
+				"title": "Vue SFC Editor: Map Vuex getter"
+			},
+			{
 				"command": "vueSfcEditor.sortData",
 				"title": "Vue SFC Editor: Sort Data"
 			}
@@ -110,6 +114,10 @@
 				},
 				{
 					"command": "vueSfcEditor.mapVuexAction",
+					"when": "editorLangId == vue"
+				},
+				{
+					"command": "vueSfcEditor.mapVuexGetter",
 					"when": "editorLangId == vue"
 				},
 				{

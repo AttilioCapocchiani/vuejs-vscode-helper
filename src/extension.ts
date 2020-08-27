@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 
+import { ComputedCodeLensProvider } from './codelens/ComputedCodeLensProvider';
 import { DataCodeLensProvider } from './codelens/DataCodeLensProvider';
 import { ExportDefaultCodeLensProvider } from './codelens/ExportDefaultCodeLensProvider';
 import { MethodCodeLensProvider } from './codelens/MethodCodeLensProvider';
@@ -17,15 +18,17 @@ import { addWatchSectionCommand } from './commands/addWatchSection';
 import { addCreatedSectionCommand } from './commands/addCreatedSection';
 import { addDataSectionCommand } from './commands/addDataSection';
 import { createComponentCommand } from './commands/createComponent';
-import { mapVuexActionCommand } from './commands/mapVuex';
+import { mapVuexActionCommand, mapVuexGetterCommand } from './commands/mapVuex';
 
 export function activate(context: vscode.ExtensionContext) {
+  const computedCodeLensProvider = new ComputedCodeLensProvider();
   const dataCodeLensProvider = new DataCodeLensProvider();
   const exportDefaultCodeLensProvider = new ExportDefaultCodeLensProvider();
   const methodCodeLensProvider = new MethodCodeLensProvider();
   const propCodeLensProvider = new PropCodeLensProvider();
   const watchCodeLensProvider = new WatchCodeLensProvider();
 
+  vscode.languages.registerCodeLensProvider("vue", computedCodeLensProvider);
   vscode.languages.registerCodeLensProvider("vue", dataCodeLensProvider);
   vscode.languages.registerCodeLensProvider("vue", exportDefaultCodeLensProvider);
   vscode.languages.registerCodeLensProvider("vue", methodCodeLensProvider);
@@ -50,6 +53,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   // Vuex
   const mapVuexAction = vscode.commands.registerCommand("vueSfcEditor.mapVuexAction", mapVuexActionCommand);
+  const mapVuexGetter = vscode.commands.registerCommand("vueSfcEditor.mapVuexGetter", mapVuexGetterCommand);
 
   context.subscriptions.push(addCreatedSection);
   context.subscriptions.push(addData);
@@ -62,5 +66,6 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(addWatchSection);
   context.subscriptions.push(createNewComponent);
   context.subscriptions.push(mapVuexAction);
+  context.subscriptions.push(mapVuexGetter);
   context.subscriptions.push(sortData);
 }

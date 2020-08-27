@@ -41,3 +41,9 @@ export interface MapVuexActionState {
   mappedName: string | undefined
   language: string | undefined
 }
+
+export interface MapVuexGetterState {
+  getterName: string | undefined
+  mappedName: string | undefined
+  language: string | undefined
+}
